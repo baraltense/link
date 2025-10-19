@@ -1,4 +1,4 @@
-name = "mi-acortador-enlaces"
+name = "baraltense"
 compatibility_date = "2024-01-15"
 account_id = "fb1c0561a0dfd279b2486c2bcbca86ed"
 main = "worker.js"
