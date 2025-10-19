@@ -22,16 +22,16 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-    
-    - name: Install dependencies
-          run: |
-    if [ -f package-lock.json ] || [ -f npm-shrinkwrap.json ] || [ -f yarn.lock ]; then
-      echo "Lockfile found — running npm ci"
-      npm ci
-    else
-      echo "No lockfile found — running npm install"
-      npm install
-    fi
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ] || [ -f npm-shrinkwrap.json ] || [ -f yarn.lock ]; then
+            echo "Lockfile found — running npm ci"
+            npm ci
+          else
+            echo "No lockfile found — running npm install"
+            npm install
+          fi
 
       - name: Build (if applicable)
         run: npm run build --if-present
@@ -50,7 +50,6 @@ jobs:
       - name: Publish to Cloudflare Workers
         env:
           CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
-          # Optional: include CF_ACCOUNT_ID if your wrangler.toml requires it as env
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
         run: |
           # If you rely on an account id in env, ensure it's present
