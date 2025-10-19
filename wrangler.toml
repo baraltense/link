@@ -3,7 +3,6 @@ compatibility_date = "2024-01-15"
 account_id = "fb1c0561a0dfd279b2486c2bcbca86ed"
 main = "worker.js"
 
-# AGREGA ESTO:
 [[kv_namespaces]]
 binding = "LINKS"
-id = "id-de-tu-kv"  # Lo ves en Cloudflare Dashboard
+id = "c780f8d21c5b48a184dacd42e5ef601e"
