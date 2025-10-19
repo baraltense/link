@@ -2,26 +2,71 @@ name: 🚀 Deploy to Cloudflare Workers
 
 on:
   push:
-    branches: [ main, master ]
+    branches:
+      - main
+
+permissions:
+  contents: read
+  id-token: write
 
 jobs:
   deploy:
+    name: Deploy to Cloudflare Workers
     runs-on: ubuntu-latest
-    name: Deploy Worker
     steps:
-      - name: 📥 Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
-        
-      - name: 🛠️ Setup Node.js
+
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          
-      - name: 📦 Install Wrangler
-        run: npm install -g wrangler@4.43.0
-        
-      - name: 🚀 Deploy to Cloudflare Workers
-        run: wrangler deploy
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build (if applicable)
+        run: npm run build --if-present
+
+      - name: Install wrangler
+        run: npm install -g wrangler
+
+      - name: Show wrangler.toml (debug)
+        run: |
+          echo "=== wrangler.toml (if present) ==="
+          if [ -f wrangler.toml ]; then cat wrangler.toml; else echo "wrangler.toml not found"; fi
+
+      - name: Wrangler version (debug)
+        run: wrangler --version
+
+      - name: Publish to Cloudflare Workers
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          # Optional: include CF_ACCOUNT_ID if your wrangler.toml requires it as env
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          # If you rely on an account id in env, ensure it's present
+          if [ -z "$CF_API_TOKEN" ]; then
+            echo "ERROR: CF_API_TOKEN is not set. Please add it to repository secrets."
+            exit 1
+          fi
+
+          # Show whoami to confirm auth (non-fatal)
+          wrangler whoami || true
+
+          # Publish. Adjust flags if you use environments: e.g. wrangler publish --env production
+          wrangler publish
+
+      - name: Print Wrangler logs on failure
+        if: failure()
+        run: |
+          echo "---- Wrangler logs ----"
+          ls -lah /home/runner/.config/.wrangler/logs || true
+          cat /home/runner/.config/.wrangler/logs/wrangler-*.log || true
+
+      - name: Print workspace top-level files on failure
+        if: failure()
+        run: |
+          echo "---- Workspace top-level files ----"
+          ls -lah
