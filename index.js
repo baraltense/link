@@ -1,4 +1,4 @@
-addEventListener("fetch", (event) => {
+addEventListener("fetch", event => {
   event.respondWith(handleRequest(event.request));
 });
 
@@ -8,31 +8,13 @@ async function handleRequest(request) {
 
   if (path === "") {
     return new Response(`
-      <html>
-      <head><title>Baraltense Shortener</title></head>
-      <body style="font-family:system-ui; max-width:600px; margin:2rem auto; padding:0 1rem;">
-        <h2>🔗 Acortador Baraltense</h2>
-        <form method="POST">
-          <div>
-            <label>Enlace largo:</label><br>
-            <input name="url" placeholder="https://ejemplo.com/..." style="width:100%; padding:8px; margin:5px 0;" required>
-          </div>
-          <div>
-            <label>Nombre corto (opcional):</label><br>
-            <input name="slug" placeholder="ej: informe2025" style="width:100%; padding:8px; margin:5px 0;">
-          </div>
-          <button type="submit" style="padding:10px 20px; background:#1a73e8; color:white; border:none; cursor:pointer;">
-            Acortar
-          </button>
-        </form>
-        <small style="color:#666; display:block; margin-top:2rem;">
-          Ejemplo: <code>${url.origin}/informe2025</code>
-        </small>
-      </body>
-      </html>
-    `, {
-      headers: { "Content-Type": "text/html" }
-    });
+      <h2>🔗 Acortador Baraltense</h2>
+      <form method="POST">
+        <input name="url" placeholder="Pega tu enlace" required style="width:100%; padding:10px; margin:5px 0;">
+        <input name="slug" placeholder="Nombre corto (opcional)" style="width:100%; padding:10px; margin:5px 0;">
+        <button type="submit" style="width:100%; padding:12px; background:#1a73e8; color:white; border:none;">Acortar</button>
+      </form>
+    `, { headers: { "Content-Type": "text/html" } });
   }
 
   if (request.method === "POST") {
@@ -40,27 +22,17 @@ async function handleRequest(request) {
     const longUrl = formData.get("url")?.trim();
     let slug = formData.get("slug")?.trim() || Math.random().toString(36).slice(2, 8);
 
-    if (!longUrl) {
-      return new Response("Falta la URL", { status: 400 });
-    }
-
-    try {
-      new URL(longUrl);
-    } catch (e) {
-      return new Response("URL inválida", { status: 400 });
-    }
+    if (!longUrl) return new Response("Falta la URL", { status: 400 });
+    try { new URL(longUrl); } catch (e) { return new Response("URL inválida", { status: 400 }); }
 
     await URLS.put(slug, longUrl);
-    const shortUrl = `${url.origin}/${slug}`;
-    return new Response(`✅ ¡Listo!\n\nTu enlace corto:\n${shortUrl}`, {
-      headers: { "Content-Type": "text/plain; charset=utf-8" }
+    return new Response(`✅ Listo:\n${url.origin}/${slug}`, {
+      headers: { "Content-Type": "text/plain" }
     });
   }
 
   const longUrl = await URLS.get(path);
-  if (longUrl) {
-    return Response.redirect(longUrl, 302);
-  }
-
-  return new Response("❌ Enlace no encontrado", { status: 404 });
+  if (longUrl) return Response.redirect(longUrl, 302);
+  
+  return new Response("❌ No encontrado", { status: 404 });
 }
