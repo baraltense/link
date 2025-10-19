@@ -1,6 +1,6 @@
 name = "baraltense"
 main = "index.js"
-compatibility_date = "2025-10-20"
+compatibility_date = "2025-10-19"
 
 kv_namespaces = [
   { binding = "URLS", id = "4e2df629b9344190b104aaecbc614209" }
