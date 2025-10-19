@@ -1,7 +1,3 @@
-name = "baraltense"
-main = "index.js"
-compatibility_date = "2025-10-19"
-
-kv_namespaces = [
-  { binding = "URLS", id = "4e2df629b9344190b104aaecbc614209" }
-]
+name = "mi-acortador-enlaces"
+compatibility_date = "2024-01-15"
+account_id = "fb1c0561a0dfd279b2486c2bcbca86ed"
