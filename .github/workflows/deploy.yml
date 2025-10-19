@@ -22,9 +22,9 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-
-- name: Install dependencies
-  run: |
+    
+    - name: Install dependencies
+          run: |
     if [ -f package-lock.json ] || [ -f npm-shrinkwrap.json ] || [ -f yarn.lock ]; then
       echo "Lockfile found — running npm ci"
       npm ci
